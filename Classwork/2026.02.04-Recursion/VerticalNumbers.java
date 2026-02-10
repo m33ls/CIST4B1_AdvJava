@@ -1,3 +1,6 @@
+
+
+
 public class VerticalNumbers {
     final static int number = 1234;
 
