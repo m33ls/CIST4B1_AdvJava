@@ -21,8 +21,8 @@ class SalesRecords {
         // Open file
         Path path = Path.of("data.csv");
 
-        int rows = 100;
-        int tests = 5;
+        int rows = 100000;
+        int tests = 10;
 
         
         for (int i = 0; i < tests; i++) {
@@ -71,24 +71,38 @@ class SalesRecords {
         // This is on purpose
         
         for (int i = 1; i <= n; i++) {
-            bw.append(i + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
+            String date = rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28);
+            bw.append(i + "," + date + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
         }
 
         // Add duplicate to test duplicate check
-        bw.append(rand.nextInt(1,n) + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
+        String date = rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28);
+        bw.append(rand.nextInt(1,n) + "," + date + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
 
         long end_t = System.nanoTime();
         System.out.println("Wrote " + n + " items in " + (end_t - start_t) + "ns.");
     }
 
-    public static void search_id(BufferedReader br, int id) {
+    public static String search_id(BufferedReader br, int id) throws Exception {
         //System.out.println("Searching for id " + id);
         long start_t = System.nanoTime();
 
-        // Binary Search
+        br.readLine();
 
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] cols = line.split(",");
+            int id_0 = Integer.parseInt(cols[0]);
+
+            if (id_0 == id) {
+                long end_t = System.nanoTime();
+                System.out.println("Found id " + id + " [" + line + "] " + " in " + (end_t - start_t) + "ns.");
+                return line;
+            }
+        }
         long end_t = System.nanoTime();
-        System.out.println("Found id " + id + " at ROW " + " in " + (end_t - start_t) + "ns.");
+        System.out.println("Id not found in " + (end_t - start_t) + "ns.");
+        return "";
     }
 
     public static Set<Integer> check_duplicates(BufferedReader br) throws Exception {
@@ -101,7 +115,8 @@ class SalesRecords {
         Set<Integer> duplicates = new HashSet<>();
         Set<Integer> seen = new HashSet<>();
 
-        String headers = br.readLine();
+        br.readLine();
+
         String line;
         while ((line = br.readLine()) != null) {
             String[] cols = line.split(",");
@@ -121,34 +136,27 @@ class SalesRecords {
         long start_t = System.nanoTime();
 
         // Retrieve latest by date
-        String headers = br.readLine();
-        double total = 0;
+        br.readLine();
 
-        String line;
-        
+        String line;    
         String latest = "";
         String[] latest_date = {"0","0","0"};
 
         while ((line = br.readLine()) != null) {
             String[] cols = line.split(",");
             String[] date = cols[1].split("-");
-            if (Integer.parseInt(date[0]) > Integer.parseInt(latest_date[0])) {
+            int year = Integer.parseInt(date[0]);
+            int latest_year = Integer.parseInt(latest_date[0]);
+            int month = Integer.parseInt(date[1]);
+            int latest_month = Integer.parseInt(latest_date[1]);
+            int day = Integer.parseInt(date[2]);
+            int latest_day = Integer.parseInt(latest_date[2]);
+            if (year > latest_year || (year == latest_year && month > latest_month) || (year == latest_year && month == latest_month && day > latest_day)) {
                 latest_date[0] = date[0];
                 latest_date[1] = date[1];
                 latest_date[2] = date[2];
                 latest = line;   
-            } else if (Integer.parseInt(date[0]) == Integer.parseInt(latest_date[0]) && Integer.parseInt(date[1]) > Integer.parseInt(latest_date[1])) {
-                latest_date[0] = date[0];
-                latest_date[1] = date[1];
-                latest_date[2] = date[2];
-                latest = line;
-            } else if (Integer.parseInt(date[0]) == Integer.parseInt(latest_date[0]) && Integer.parseInt(date[1]) == Integer.parseInt(latest_date[1]) && Integer.parseInt(date[2]) > Integer.parseInt(latest_date[2])) {
-                latest_date[0] = date[0];
-                latest_date[1] = date[1];
-                latest_date[2] = date[2];
-                latest = line;
             }
-            
         }
 
         long end_t = System.nanoTime();
@@ -160,7 +168,7 @@ class SalesRecords {
         long start_t = System.nanoTime();
 
         // Compute revenue
-        String headers = br.readLine();
+        br.readLine();
         double total = 0;
 
         String line;
@@ -180,4 +188,22 @@ class SalesRecords {
 
 /* Writeup
  * 
+ * Based on our graph*, the points for each of our functions lie between O(n) and O(n^2), 
+ * which means they'd best be modeled as linearithmic O(nlogn). I think more accurately,
+ * they're slightly worse than linearithmic, perhaps O(n^(some exponent k, 1<k<2)).
+ * 
+ * This makes sense, because we're not recursing or looping nestedly, but we may at any
+ * point check up to n lines of our data. This could be improved by using a more efficient
+ * search, e.g. binary search.
+ * 
+ * Interestingly, I expected the duplicate check to function much more efficiently because
+ * it's utilising HashSets, which was something new to me, but I've realised that since it's
+ * iterating over the file, it can't be any faster than a for loop over n lines anyway.
+ * However, I expected it to work as well as the search function, and it did significantly 
+ * worse, probably it's reading and writing to memory for each iteration.
+ * 
+ * Overall, it didn't function too differently from how I would've expected, and I've 
+ * noticed a few things I can improve in my code to make it more efficient.
+ * 
+ * * The graph is included as a pdf in this same directory
  */
