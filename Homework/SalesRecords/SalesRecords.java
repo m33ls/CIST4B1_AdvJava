@@ -94,13 +94,43 @@ class SalesRecords {
         System.out.println("Checked duplicates in " + (end_t - start_t) + "ns.");
     }
 
-    public static void retrieve_latest(BufferedReader br) {
+    public static void retrieve_latest(BufferedReader br) throws Exception{
         long start_t = System.nanoTime();
 
-        // Retrieve latest
+        // Retrieve latest by date
+        String headers = br.readLine();
+        double total = 0;
+
+        String line;
+        
+        String latest = "";
+        String[] latest_date = {"0","0","0"};
+
+        while ((line = br.readLine()) != null) {
+            String[] cols = line.split(",");
+            String[] date = cols[1].split("-");
+            if (Integer.parseInt(date[0]) > Integer.parseInt(latest_date[0])) {
+                latest_date[0] = date[0];
+                latest_date[1] = date[1];
+                latest_date[2] = date[2];
+                latest = line;   
+            } else if (Integer.parseInt(date[0]) == Integer.parseInt(latest_date[0]) && Integer.parseInt(date[1]) > Integer.parseInt(latest_date[1])) {
+                latest_date[0] = date[0];
+                latest_date[1] = date[1];
+                latest_date[2] = date[2];
+                latest = line;
+            } else if (Integer.parseInt(date[0]) == Integer.parseInt(latest_date[0]) && Integer.parseInt(date[1]) == Integer.parseInt(latest_date[1]) && Integer.parseInt(date[2]) > Integer.parseInt(latest_date[2])) {
+                latest_date[0] = date[0];
+                latest_date[1] = date[1];
+                latest_date[2] = date[2];
+                latest = line;
+            }
+            
+        }
 
         long end_t = System.nanoTime();
-        System.out.println("Retrieved latest in " + (end_t - start_t) + "ns.");
+        String[] latest_cols = latest.split(",");
+        System.out.println("Retrieved latest [ ID: " + latest_cols[0] + ", Date: " + latest_cols[1] + ", Cost: $" + latest_cols[2] + ", Item: " + latest_cols[3] + " ] in " + (end_t - start_t) + "ns.");
     }
 
     public static double compute_revenue(BufferedReader br) throws Exception {
@@ -120,7 +150,7 @@ class SalesRecords {
         DecimalFormat df = new DecimalFormat("###,###.##");
 
         long end_t = System.nanoTime();
-        System.out.println("Computed reveneue of $" + df.format(total) + " in " + (end_t - start_t) + "ns.");
+        System.out.println("Computed revenue of $" + df.format(total) + " in " + (end_t - start_t) + "ns.");
         return total;
     }
 }
