@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.*;
 import java.util.Random;
 
 class SalesRecords {
@@ -19,31 +20,39 @@ class SalesRecords {
         Path path = Path.of("data.csv");
 
         int rows = 100;
-        int tests = 1;
+        int tests = 5;
 
-        try (BufferedWriter bw = Files.newBufferedWriter(path)) {
-            for (int i = 0; i < tests; i++) {
+        
+        for (int i = 0; i < tests; i++) {
+            try (BufferedWriter bw = Files.newBufferedWriter(path)) {
                 gen_data(bw, rows);
             }
         }
-
-        try (BufferedReader br = Files.newBufferedReader(path)) {
-            Random rand = new Random();
-            for (int i = 0; i < tests; i++) {
+        
+        Random rand = new Random();
+        for (int i = 0; i < tests; i++) {
+            try (BufferedReader br = Files.newBufferedReader(path)) {
                 int id = rand.nextInt(1,rows);
                 search_id(br, id);
             }
-            for (int i = 0; i < tests; i++) {
+        }
+        for (int i = 0; i < tests; i++) {
+            try (BufferedReader br = Files.newBufferedReader(path)) {
                 check_duplicates(br);
             }
-            for (int i = 0; i < tests; i++) {
+        }
+        for (int i = 0; i < tests; i++) {
+            try (BufferedReader br = Files.newBufferedReader(path)) {
                 retrieve_latest(br);
             }
-            for (int i = 0; i < tests; i++) {
+        }
+        for (int i = 0; i < tests; i++) {
+            try (BufferedReader br = Files.newBufferedReader(path)) {
                 compute_revenue(br);
             }
-
         }
+
+        
     }
 
     public static void gen_data(BufferedWriter bw, int n) throws Exception {
@@ -52,13 +61,14 @@ class SalesRecords {
         bw.write("sale_id,sale_date,amount,product\n");
         
         Random rand = new Random();
+        DecimalFormat df = new DecimalFormat("###,###.##");
         String[] items = {"Doohickey", "Thingamajig", "Whatsit", "Gadget"};
 
         // Loop n times, appending lines of random data
         // Not expected to be efficient, as it's generating lots of random numbers
         // This is on purpose
         for (int i = 1; i <= n; i++) {
-            bw.append(i + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + (int) ((Math.random() * 9000) + 100) / 100.0 + "," + items[rand.nextInt(0,3)] + "\n");
+            bw.append(i + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
         }
 
         long end_t = System.nanoTime();
@@ -93,13 +103,25 @@ class SalesRecords {
         System.out.println("Retrieved latest in " + (end_t - start_t) + "ns.");
     }
 
-    public static void compute_revenue(BufferedReader br) {
+    public static double compute_revenue(BufferedReader br) throws Exception {
         long start_t = System.nanoTime();
 
         // Compute revenue
+        String headers = br.readLine();
+        double total = 0;
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] cols = line.split(",");
+            double amount = Double.parseDouble(cols[2]);
+            total += amount;
+        }
+
+        DecimalFormat df = new DecimalFormat("###,###.##");
 
         long end_t = System.nanoTime();
-        System.out.println("Computed reveneue in " + (end_t - start_t) + "ns.");
+        System.out.println("Computed reveneue of $" + df.format(total) + " in " + (end_t - start_t) + "ns.");
+        return total;
     }
 }
 
