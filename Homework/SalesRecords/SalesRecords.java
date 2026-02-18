@@ -12,7 +12,9 @@ import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.*;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 class SalesRecords {
     public static void main(String[] args) throws Exception{
@@ -67,9 +69,13 @@ class SalesRecords {
         // Loop n times, appending lines of random data
         // Not expected to be efficient, as it's generating lots of random numbers
         // This is on purpose
+        
         for (int i = 1; i <= n; i++) {
             bw.append(i + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
         }
+
+        // Add duplicate to test duplicate check
+        bw.append(rand.nextInt(1,n) + "," + rand.nextInt(1969,2026) + "-" + rand.nextInt(1,12) + "-" + rand.nextInt(1,28) + "," + df.format(Math.random() * 100) + "," + items[rand.nextInt(0,3)] + "\n");
 
         long end_t = System.nanoTime();
         System.out.println("Wrote " + n + " items in " + (end_t - start_t) + "ns.");
@@ -85,13 +91,30 @@ class SalesRecords {
         System.out.println("Found id " + id + " at ROW " + " in " + (end_t - start_t) + "ns.");
     }
 
-    public static void check_duplicates(BufferedReader br) {
+    public static Set<Integer> check_duplicates(BufferedReader br) throws Exception {
         long start_t = System.nanoTime();
 
         // Check duplicates
+        // Trying something new with HashSets, because it should be faster than
+        // e.g. making an array and checking over and over
+
+        Set<Integer> duplicates = new HashSet<>();
+        Set<Integer> seen = new HashSet<>();
+
+        String headers = br.readLine();
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] cols = line.split(",");
+            int id = Integer.parseInt(cols[0]);
+            if (!seen.add(id)) {
+                duplicates.add(id);
+                System.out.println("Duplicate: " + id);
+            }
+        }
 
         long end_t = System.nanoTime();
         System.out.println("Checked duplicates in " + (end_t - start_t) + "ns.");
+        return duplicates;
     }
 
     public static void retrieve_latest(BufferedReader br) throws Exception{
