@@ -86,7 +86,7 @@ public class SinglyLinkedList<T> {
         return null;
     }
 
-    public T removeIndex(T data, int idx) {
+    public T removeIndex(int idx) {
         if (this.head == null) {
             return null;
         }
