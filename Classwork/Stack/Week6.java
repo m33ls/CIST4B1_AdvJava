@@ -7,5 +7,8 @@ public class Week6 {
         System.out.println(myStack.pop());
         System.out.println(myStack.pop());
         System.out.println(myStack.pop());
+        NodePQ<Integer> root = new NodePQ<>(72);
+        root.left = new NodePQ<>(52);
+        root.right = new NodePQ<>(63);
     }
 }
