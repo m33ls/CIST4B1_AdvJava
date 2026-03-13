@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Order {
@@ -93,6 +94,7 @@ public class Order {
         System.out.println("Total Orders Completed (From ArrayList): " + (DIorder.completed_items.size() + TAorder.completed_items.size()));
         System.out.println("Dine-in Order Count: " + DIorder.customers);
         System.out.println("Takeaway Order Count: " + TAorder.customers);
-        System.out.println("Total Revenue: $" + (TAorder.revenue + DIorder.revenue));
+        DecimalFormat df=new DecimalFormat("###,###.##");
+        System.out.println("Total Revenue: $" + df.format(TAorder.revenue + DIorder.revenue));
     }
 }
