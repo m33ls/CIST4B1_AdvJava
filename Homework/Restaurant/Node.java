@@ -2,7 +2,7 @@ public class Node<T> {
     // Data
     public T data;
     // Link
-    public Node next;
+    public Node<T> next;
 
     Node(T data){
         this.data = data;

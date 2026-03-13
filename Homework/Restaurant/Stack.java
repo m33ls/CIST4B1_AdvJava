@@ -39,7 +39,7 @@ public class Stack<T> {
     }
 
     public T peek() {
-        if (!this.isEmpty()) {
+        if (!isEmpty()) {
             return (T) data[currSize - 1];
         } else {
             return null;

@@ -76,7 +76,7 @@ public class SinglyLinkedList<T> {
         Node<T> curr = this.head;
         while(curr.next != null) {
             if (curr.next.data == data) {
-                T returnData = curr.next.data;
+                T returnData = (T) curr.next.data;
                 curr.next = curr.next.next;
                 this.length--;
                 return returnData;
@@ -102,7 +102,7 @@ public class SinglyLinkedList<T> {
         Node<T> curr = this.head; // NOT DONE
         for (int i = 0; i < idx; i++) {
             if (curr.next.data == data) {
-                T returnData = curr.next.data;
+                T returnData = (T) curr.next.data;
                 curr.next = curr.next.next;
                 this.length--;
                 return returnData;

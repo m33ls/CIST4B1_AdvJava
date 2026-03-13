@@ -5,9 +5,8 @@ public class Queue<T> {
     private Object[] data;
 
     public Queue(int size) {
-        this.size = size;
         data = new Object[size];
-        size = 0;
+        this.size = 0;
         head = 0;
         tail = 0;
     }
@@ -18,13 +17,12 @@ public class Queue<T> {
             this.tail = (this.tail + 1) % data.length;
             size++;
         } else {
-            // need to grow array
-            // Insert data unwrapped
+            System.err.println("Error: Queue full");
         }
     }
 
     public T dequeue() {
-        if (size != data.length) {
+        if (size != 0) {
             T retValue = (T) this.data[this.head];
             this.data[this.head] = null;
             this.head = (this.head + 1) % data.length;
