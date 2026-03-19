@@ -76,18 +76,26 @@ public class Order {
             // % chance customer orders random item per step per station
             if (Math.random() < 0.4) {
                 System.out.println("Customer enters");
-                DIorder.DIOrder(menu.get(1));
+                if (Math.random() < 0.5) {
+                    DIorder.DIOrder(menu.get(1));
+                } else {
+                    DIorder.DIOrder(menu.get(0));
+                }
             } 
             if (Math.random() < 0.4) {
                 System.out.println("Car pulls up to drive through");
-                TAorder.TAOrder(new Hamburger());
+                if (Math.random() < 0.5) {
+                    TAorder.TAOrder(menu.get(1));
+                } else {
+                    TAorder.TAOrder(menu.get(0));
+                }
             }
 
             DIorder.step();
             TAorder.step();
         }
 
-        System.out.println();
+        System.out.println(); 
         System.out.println("Statistics");
         System.out.println("Total Customers Processed: " + (TAorder.customers + DIorder.customers));
         System.out.println("Total Orders Completed: " + (DIorder.completed + TAorder.completed));
