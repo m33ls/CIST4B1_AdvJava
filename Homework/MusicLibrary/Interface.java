@@ -5,7 +5,8 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 class Interface {
-    Queue<Song> queue;
+    LinkedListQueue<Song> queue;
+    LinkedListStack<Song> history;
     String base_dir = "Homework/MusicLibrary/Music/";
     String dir;
 
@@ -14,7 +15,8 @@ class Interface {
     }
 
     // Change Directory
-    private void cd(String dir) {
+    // O(1)
+    private void cd(Strinnextg dir) {
         this.dir += dir + "/";
     }
 
@@ -23,6 +25,7 @@ class Interface {
     }
 
     // List
+    // O(n)
     private void list_files() {
         try (Stream<Path> stream = Files.list(Paths.get(dir))) {
             stream
@@ -34,12 +37,38 @@ class Interface {
         }
     }
 
+    // Get full file name from segment 
+    // (Search through file list)
+    // O(n)
+    private String get_full(String segment) {
+        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
+            return stream
+            .filter(file -> !Files.isDirectory(file))
+            .map(Path::getFileName)
+            .map(Path::toString)
+            .filter(name -> name.toLowerCase().contains(segment.toLowerCase()))
+            .findFirst()
+            .orElse(null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Print Metadata
+    // O(1)
     private void get_info(String path) {
         System.out.println("Info");
         System.out.println("Path: " + dir + path);
         Song song = new Song(Path.of( dir + path));
         song.printMetadata();
+    }
+
+    private void queue() {}
+    private void play() { // 'play' and dequeue
+    }
+    private void previous() {}
+    private void skip() { // dequeue
     }
 
     // TEST
@@ -50,7 +79,7 @@ class Interface {
         ui.get_info("Common-People.mp3");
         ui.cd("MyPlaylist");
         ui.list_files();
-        ui.get_info("19 - Good Ol' Days.mp3");
+        ui.get_info(ui.get_full("Good"));
         ui.cd();
         ui.cd("Crystal Castles - Crystal Castles");
         ui.list_files();
