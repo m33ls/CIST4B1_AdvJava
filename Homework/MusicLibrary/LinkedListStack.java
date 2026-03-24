@@ -15,7 +15,7 @@ public class LinkedListStack<T> {
     public T pop() {
         if (!this.isEmpty()) {
             currSize--;
-            T retValue = (T) data.head;
+            T retValue = (T) data.head.data;
             data.removeIndex(0);
             return retValue;
         } else {
@@ -26,7 +26,7 @@ public class LinkedListStack<T> {
 
     public T peek() {
         if (!this.isEmpty()) {
-            return (T) data.head;
+            return (T) data.head.data;
         } else {
             return null;
         }
