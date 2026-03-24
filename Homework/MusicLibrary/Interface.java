@@ -163,7 +163,11 @@ class Interface {
         Scanner scanner = new Scanner(System.in);
         String input;
 
-        System.out.println("Amelia's Music Library");
+        System.out.println("                      __ __                            ______");       
+        System.out.println(".---.-.--------.-----|  |__.---.-.-----.--------.-----|__    .-----.");
+        System.out.println("|  _  |        |  -__|  |  |  _  |__ --|        |  _  |__    |__ --|");
+        System.out.println("|___._|__|__|__|_____|__|__|___._|_____|__|__|__|   __|______|_____|");
+        System.out.println("                                                |__|                ");
         while (true) {
             System.out.print("$ ");
             input = scanner.nextLine().trim();
