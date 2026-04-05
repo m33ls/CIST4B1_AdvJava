@@ -9,28 +9,31 @@ import java.util.stream.Stream;
 class Interface {
     LinkedListQueue<Song> queue;
     LinkedListStack<Song> history;
-    String base_dir = "Homework/MusicLibrary/Music/";
+    String base_dir = "Music/";
     String dir;
 
     Interface() {
         queue = new LinkedListQueue<>();
         history = new LinkedListStack<>();
-        cd();
+        cd(null);
     }
 
     // Change Directory
     // O(1)
     private void cd(String dir) {
-        if (this.dir == null) {
+        if (dir == null || this.dir == null) {
             this.dir = base_dir;
+        } else {
+            String path = get_full(dir);
+            this.dir = Paths.get(this.dir).resolve(path).toString() + "/";
         }
-        String path = get_full(dir);
-        this.dir = Paths.get(this.dir).resolve(path).toString() + "/";
     }
 
-    private void cd() {
-        this.dir = base_dir;
+    // Print help text
+    private void help() {
+        System.out.println("Available commands include: \ncd (relative directory); change directory, partial names will be autocompleted\nls; list files\nqueue | q; enqueue folder or song, names will be autocompleted\nplay; play song\nskip | s; skip song\nprevious | prev | p; play previous song\ninfo (relative file); display metadata of file\ncurrent; display current metadata\nhelp | h; display this dialogue");
     }
+    
 
     // List
     // O(n)
@@ -68,6 +71,10 @@ class Interface {
         System.out.println("Info");
         System.out.println("Path: " + dir + path);
         Song song = new Song(Path.of( dir + path));
+        song.printMetadata();
+    }
+    private void get_info(Song song) {
+        System.out.println("Info");
         song.printMetadata();
     }
 
@@ -168,6 +175,7 @@ class Interface {
         System.out.println("|  _  |        |  -__|  |  |  _  |__ --|        |  _  |__    |__ --|");
         System.out.println("|___._|__|__|__|_____|__|__|___._|_____|__|__|__|   __|______|_____|");
         System.out.println("                                                |__|                ");
+        System.out.println("                             Type 'help' for options, 'exit' to quit");
         while (true) {
             System.out.print("$ ");
             input = scanner.nextLine().trim();
@@ -187,12 +195,11 @@ class Interface {
             }
 
             switch (function.toLowerCase()) {
-                case "ls" -> ui.list_files();
                 case "cd" -> {
-                    if (arguments.isEmpty()) {
+                    if (!arguments.isEmpty()) {
                         ui.cd(arguments);
                     } else {
-                        ui.cd();
+                        ui.cd(null);
                     }
                 }
                 case "info" -> {
@@ -205,10 +212,23 @@ class Interface {
                         ui.queue(arguments);
                     }
                 }
-                case "play" -> ui.play();
+                case "q" -> {
+                    if (!arguments.isEmpty()) {
+                        ui.queue(arguments);
+                    }
+                }
+                case "ls"       -> ui.list_files();
+                case "current"  -> ui.get_info(ui.queue.peek());
+                case "play"     -> ui.play();
                 case "previous" -> ui.previous();
-                case "skip" -> ui.skip();
-                default -> System.out.println("Unknown command. Typo?");
+                case "prev"     -> ui.previous();
+                case "p"        -> ui.previous();
+                case "skip"     -> ui.skip();
+                case "next"     -> ui.skip();
+                case "s"        -> ui.skip();
+                case "help"     -> ui.help();
+                case "h"        -> ui.help();
+                default         -> System.out.println("Unknown command. Typo? \nEnter 'help' for help.");
             }
         }
     }
